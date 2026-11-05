@@ -1,0 +1,22 @@
+{
+  "name": "project-rrr",
+  "version": "2.0.0",
+  "description": "Project RRR (Repair First, Replace Last) - AI-powered global diagnostic platform",
+  "scripts": {
+    "start": "node server/index.js",
+    "build": "npm --prefix client run build",
+    "client": "npm --prefix client run dev",
+    "server": "npm --prefix server run dev",
+    "install:all": "npm --prefix server install && npm --prefix client install"
+  },
+  "keywords": [
+    "repair-first-replace-last",
+    "e-waste",
+    "viability-score",
+    "visakhapatnam",
+    "gemini-ai",
+    "quantum-four"
+  ],
+  "author": "Quantum Four (Visakhapatnam, AP, India)",
+  "license": "MIT"
+}
