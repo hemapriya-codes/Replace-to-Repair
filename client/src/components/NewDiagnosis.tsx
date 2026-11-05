@@ -9,25 +9,58 @@ import {
   CheckCircle2, 
   Zap, 
   AlertCircle,
-  FileText
+  FileText,
+  Flame,
+  BatteryCharging,
+  Snowflake,
+  Disc,
+  Wind,
+  Tv,
+  Fan,
+  Droplets,
+  RotateCw,
+  Utensils,
+  Shirt,
+  Filter,
+  Check
 } from 'lucide-react';
 import { ScannerModal } from './ScannerModal';
 import { runAIDiagnosis } from '../services/api';
 import { DiagnosisResult } from '../types';
+import { APPLIANCE_CATEGORIES, ApplianceCategory, checkEvidenceSufficiency } from '../data/applianceCatalog';
 
 interface NewDiagnosisProps {
   onDiagnosisCompleted: (result: DiagnosisResult) => void;
   userLocation: string;
 }
 
+// Icon mapper for the 12 appliance categories
+const categoryIconMap: Record<string, React.ElementType> = {
+  microwave: Flame,
+  inverter: BatteryCharging,
+  refrigerator: Snowflake,
+  'washing-machine': Disc,
+  'air-conditioner': Wind,
+  television: Tv,
+  fan: Fan,
+  geyser: Droplets,
+  'mixer-grinder': RotateCw,
+  dishwasher: Utensils,
+  'electric-iron': Shirt,
+  'water-purifier': Filter,
+};
+
 export const NewDiagnosis: React.FC<NewDiagnosisProps> = ({
   onDiagnosisCompleted,
   userLocation,
 }) => {
-  const [machineLabel, setMachineLabel] = useState('');
-  const [symptoms, setSymptoms] = useState('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('washing-machine');
+  const [machineLabel, setMachineLabel] = useState('LG Top-Load Smart Inverter Washing Machine (7.0 kg)');
+  const [symptoms, setSymptoms] = useState('Loud rattling metallic noise during high-speed spin cycle and drum wobble against chassis');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    'https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?auto=format&fit=crop&w=600&q=80'
+  );
   const [isScanning, setIsScanning] = useState(false);
   const [pendingResult, setPendingResult] = useState<DiagnosisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,9 +68,13 @@ export const NewDiagnosis: React.FC<NewDiagnosisProps> = ({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Active Category Object
+  const activeCategory = APPLIANCE_CATEGORIES.find(c => c.id === selectedCategoryId) || APPLIANCE_CATEGORIES[3];
+
   // Quick Demo Presets
   const demoPresets = [
     {
+      categoryId: 'washing-machine',
       title: 'LG Top-Load Washing Machine',
       symptoms: 'Loud rattling noise during spin cycle, violent drum wobble against chassis',
       image: 'https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?auto=format&fit=crop&w=600&q=80',
@@ -45,6 +82,7 @@ export const NewDiagnosis: React.FC<NewDiagnosisProps> = ({
       badgeColor: 'text-emerald-400 bg-emerald-950 border-emerald-800',
     },
     {
+      categoryId: 'refrigerator',
       title: 'Samsung 253L Digital Inverter Refrigerator',
       symptoms: 'Freezer freezing fine but lower vegetable compartment is warm; back panel iced up',
       image: 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=600&q=80',
@@ -52,6 +90,7 @@ export const NewDiagnosis: React.FC<NewDiagnosisProps> = ({
       badgeColor: 'text-emerald-400 bg-emerald-950 border-emerald-800',
     },
     {
+      categoryId: 'air-conditioner',
       title: 'Voltas 1.5 Ton Split AC',
       symptoms: 'Blower running smoothly but weak cooling; outdoor condenser fan turns sluggishly',
       image: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=600&q=80',
@@ -59,6 +98,7 @@ export const NewDiagnosis: React.FC<NewDiagnosisProps> = ({
       badgeColor: 'text-amber-400 bg-amber-950 border-amber-800',
     },
     {
+      categoryId: 'washing-machine',
       title: 'IFB Front-Load Washing Machine (9 Years Old)',
       symptoms: 'Error E02, acrid burning smell, outer tub cracked and leaking water, rusted frame',
       image: 'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?auto=format&fit=crop&w=600&q=80',
@@ -67,7 +107,19 @@ export const NewDiagnosis: React.FC<NewDiagnosisProps> = ({
     },
   ];
 
+  const handleSelectCategory = (cat: ApplianceCategory) => {
+    setSelectedCategoryId(cat.id);
+    const brand = cat.popularBrands[0] || 'Brand';
+    setMachineLabel(`${brand} ${cat.name}`);
+    // Suggest first common symptom
+    if (cat.defaultFaults[0]?.commonSymptoms[0]) {
+      setSymptoms(cat.defaultFaults[0].commonSymptoms[0]);
+    }
+    setErrorMsg(null);
+  };
+
   const applyPreset = (preset: typeof demoPresets[0]) => {
+    setSelectedCategoryId(preset.categoryId);
     setMachineLabel(preset.title);
     setSymptoms(preset.symptoms);
     setImagePreview(preset.image);
@@ -119,12 +171,13 @@ export const NewDiagnosis: React.FC<NewDiagnosisProps> = ({
     setIsLoading(true);
 
     try {
-      // Trigger API call
+      // Trigger API call with category context
       const result = await runAIDiagnosis(
         machineLabel,
         symptoms,
         selectedImage,
-        imagePreview || undefined
+        imagePreview || undefined,
+        selectedCategoryId
       );
       setPendingResult(result);
       // Trigger animated scan modal
@@ -143,19 +196,22 @@ export const NewDiagnosis: React.FC<NewDiagnosisProps> = ({
     }
   };
 
+  // Check evidence quality for real-time feedback
+  const evidenceStatus = checkEvidenceSufficiency(symptoms, !!(selectedImage || imagePreview));
+
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-12 animate-in fade-in duration-200">
       {/* Title Header */}
       <div className="border-b border-industrial-800 pb-4">
         <div className="flex items-center space-x-2 text-brand-400 text-xs font-mono font-semibold uppercase">
           <Cpu className="h-4 w-4" />
-          <span>Multimodal Diagnostic Suite</span>
+          <span>Multimodal Diagnostic Suite • 12 Appliance Categories</span>
         </div>
         <h1 className="text-2xl font-extrabold text-white mt-1">
           New AI Appliance Diagnosis
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          Inspect visual component degradation, isolate hidden failure modes, and compute real-time Economic Brain viability.
+          Inspect visible component degradation, isolate hidden internal failure modes, and compute real-time Economic Brain viability.
         </p>
       </div>
 
@@ -194,18 +250,92 @@ export const NewDiagnosis: React.FC<NewDiagnosisProps> = ({
         </div>
       </div>
 
+      {/* Appliance Category Selector (Requirement 5: 12 Categories) */}
+      <div className="rounded-2xl border border-industrial-800 bg-industrial-900/90 p-5 shadow-xl space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-[10px] font-mono uppercase text-brand-400 font-bold tracking-wider">
+              Step 1 of 4 • Expanded Categories
+            </span>
+            <h3 className="text-base font-bold text-white">Select Appliance Category</h3>
+          </div>
+          <span className="text-[11px] font-mono text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800/60">
+            12 Specific Diagnostic Engines
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 pt-1">
+          {APPLIANCE_CATEGORIES.map((cat) => {
+            const IconComponent = categoryIconMap[cat.id] || Disc;
+            const isSelected = selectedCategoryId === cat.id;
+
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => handleSelectCategory(cat)}
+                className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all ${
+                  isSelected
+                    ? 'border-brand-500 bg-brand-950/40 text-brand-300 shadow-md shadow-brand-500/20'
+                    : 'border-industrial-800 bg-industrial-950/70 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                }`}
+              >
+                <div className={`p-2 rounded-lg mb-1.5 ${
+                  isSelected ? 'bg-brand-500/20 text-brand-400' : 'bg-industrial-900 text-slate-400'
+                }`}>
+                  <IconComponent className="h-5 w-5" />
+                </div>
+                <span className="text-xs font-bold leading-tight line-clamp-1">{cat.shortName}</span>
+                <span className="text-[9px] text-slate-500 font-mono mt-0.5">~₹{cat.newEquivalentPriceINR.toLocaleString('en-IN')}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Category Description & Common Symptom Quick Cues */}
+        <div className="rounded-xl border border-industrial-800 bg-industrial-950 p-3 mt-2 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-slate-300 font-semibold flex items-center space-x-1.5">
+              <span>{activeCategory.name}</span>
+              <span className="text-slate-500">• {activeCategory.description}</span>
+            </span>
+            <span className="text-[10px] font-mono text-slate-400">
+              Avg Lifespan: {activeCategory.typicalLifespanYears} Yrs • Weight: {activeCategory.averageWeightKg} kg
+            </span>
+          </div>
+
+          <div>
+            <span className="text-[10px] font-mono uppercase text-slate-400 font-bold block mb-1">
+              Common Fault Symptoms (Click to Add):
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {activeCategory.defaultFaults.flatMap(f => f.commonSymptoms).map((sym, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setSymptoms(sym)}
+                  className="rounded-lg bg-industrial-900 hover:bg-industrial-800 px-2.5 py-1 text-[11px] text-slate-300 hover:text-brand-300 border border-industrial-800 transition-colors text-left"
+                >
+                  + {sym}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Main Diagnostic Input Form */}
       <form onSubmit={handleRunDiagnosis} className="space-y-6">
-        {/* Step 1: Image Upload / Capture */}
+        {/* Step 2: Image Upload / Capture */}
         <div className="rounded-2xl border border-industrial-800 bg-industrial-900/90 p-5 shadow-xl space-y-3">
           <div className="flex items-center justify-between">
             <div>
               <span className="text-[10px] font-mono uppercase text-brand-400 font-bold tracking-wider">
-                Step 1 of 3
+                Step 2 of 4
               </span>
               <h3 className="text-base font-bold text-white">Appliance Photo / Visual Evidence</h3>
             </div>
-            <span className="text-xs text-slate-400">Computer Vision Analysis</span>
+            <span className="text-xs text-slate-400">Visible Damage Isolation</span>
           </div>
 
           <input
@@ -243,7 +373,7 @@ export const NewDiagnosis: React.FC<NewDiagnosisProps> = ({
                 </button>
               </div>
               <div className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-0.5 text-[10px] font-mono text-emerald-400 border border-emerald-500/40">
-                Visual Ready for Neural Inspection
+                Visual Ready for Neural & Physical Casing Inspection
               </div>
             </div>
           ) : (
@@ -260,21 +390,21 @@ export const NewDiagnosis: React.FC<NewDiagnosisProps> = ({
                 Drag and drop machine photo, or <span className="text-brand-400 underline">browse file</span>
               </p>
               <p className="text-xs text-slate-500 mt-1">
-                Supports JPG, PNG, WEBP (Photo of exterior, label plate, or damaged section)
+                Supports JPG, PNG, WEBP (Photo of exterior, casing, label plate, or damaged area)
               </p>
             </div>
           )}
         </div>
 
-        {/* Step 2: Machine Label / Model */}
+        {/* Step 3: Machine Label / Model */}
         <div className="rounded-2xl border border-industrial-800 bg-industrial-900/90 p-5 shadow-xl space-y-3">
           <div>
             <span className="text-[10px] font-mono uppercase text-brand-400 font-bold tracking-wider">
-              Step 2 of 3
+              Step 3 of 4
             </span>
             <h3 className="text-base font-bold text-white">Machine Label / Model Specification</h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Specify brand, capacity, or model code if known (e.g., <em>LG Top-Load Washing Machine 7kg</em>).
+              Specify brand, capacity, or model code if known (e.g., <em>{activeCategory.popularBrands[0]} {activeCategory.name}</em>).
             </p>
           </div>
 
@@ -282,22 +412,31 @@ export const NewDiagnosis: React.FC<NewDiagnosisProps> = ({
             type="text"
             value={machineLabel}
             onChange={(e) => setMachineLabel(e.target.value)}
-            placeholder="e.g. LG Top-Load Washing Machine (T70SJSF1Z)"
+            placeholder={`e.g. ${activeCategory.popularBrands[0]} ${activeCategory.name}`}
             required
             className="w-full rounded-xl border border-industrial-700 bg-industrial-950 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 transition-all font-mono"
           />
         </div>
 
-        {/* Step 3: User Message Box (Live Symptoms) */}
+        {/* Step 4: User Message Box (Live Symptoms) */}
         <div className="rounded-2xl border border-industrial-800 bg-industrial-900/90 p-5 shadow-xl space-y-3">
-          <div>
-            <span className="text-[10px] font-mono uppercase text-brand-400 font-bold tracking-wider">
-              Step 3 of 3
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-[10px] font-mono uppercase text-brand-400 font-bold tracking-wider">
+                Step 4 of 4
+              </span>
+              <h3 className="text-base font-bold text-white">Observed Symptoms & Fault Description</h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Describe auditory cues, error codes, leaks, or performance abnormalities.
+              </p>
+            </div>
+            <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
+              evidenceStatus.isSufficient
+                ? 'text-emerald-400 bg-emerald-950 border-emerald-800/60'
+                : 'text-amber-400 bg-amber-950 border-amber-800/60'
+            }`}>
+              Evidence: {evidenceStatus.quality}
             </span>
-            <h3 className="text-base font-bold text-white">Observed Symptoms & Fault Description</h3>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Describe auditory cues, error codes, leaks, or performance abnormalities.
-            </p>
           </div>
 
           <textarea
@@ -308,6 +447,19 @@ export const NewDiagnosis: React.FC<NewDiagnosisProps> = ({
             required
             className="w-full rounded-xl border border-industrial-700 bg-industrial-950 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 transition-all leading-relaxed"
           />
+
+          {/* Real-time Evidence Sufficiency Advisory */}
+          {!evidenceStatus.isSufficient && (
+            <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 text-xs text-amber-300 flex items-start space-x-2">
+              <AlertCircle className="h-4 w-4 shrink-0 text-amber-400 mt-0.5" />
+              <div className="space-y-1">
+                <span className="font-bold">Insufficient Detail Alert:</span>
+                <p className="text-amber-200/90">
+                  {evidenceStatus.reason || 'Please provide more details (e.g., error codes, sounds, lights, power behavior) or upload an appliance image to ensure precise fault detection without guessing.'}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Error Notice */}
@@ -326,10 +478,10 @@ export const NewDiagnosis: React.FC<NewDiagnosisProps> = ({
             className="w-full flex items-center justify-center space-x-3 rounded-2xl bg-gradient-to-r from-brand-600 to-emerald-600 py-4 text-sm font-extrabold uppercase tracking-wider text-white shadow-xl shadow-brand-500/25 hover:from-brand-500 hover:to-emerald-500 transition-all active:scale-[0.99] disabled:opacity-50"
           >
             <Sparkles className="h-5 w-5" />
-            <span>{isLoading ? 'Processing Neural Scan...' : 'Run AI Diagnosis'}</span>
+            <span>{isLoading ? 'Processing Evidence-Based Scan...' : `Run AI Diagnosis for ${activeCategory.shortName}`}</span>
           </button>
           <p className="text-center text-[11px] text-slate-500 mt-2 font-mono">
-            Powered by Google Gemini Multimodal Engine • Indexed for Visakhapatnam, IN
+            Evidence-Grounded Multi-Modal Evaluation • Calibrated for Visakhapatnam, IN
           </p>
         </div>
       </form>

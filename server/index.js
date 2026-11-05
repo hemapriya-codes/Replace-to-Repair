@@ -144,6 +144,10 @@ const LOCAL_SHOPS_VIZAG = [
     phone: '+91 98480 12345',
     address: 'Near Rythu Bazaar, Double Road, MVP Colony, Visakhapatnam - 530017',
     specialties: ['Washing Machine Drums', 'Inverter Motor Rewinding', 'Same-day Diagnosis'],
+    supportedAppliances: ['Washing Machine', 'Refrigerator', 'Inverters & Home UPS', 'Fans (Ceiling / Stand / Exhaust)', 'Mixers & Grinders'],
+    status: 'Open',
+    openingHours: 'Open Now • Closes 8:30 PM',
+    isSampleData: true,
     verified: true,
     isOpenNow: true,
   },
@@ -158,6 +162,10 @@ const LOCAL_SHOPS_VIZAG = [
     phone: '+91 891 274 5678',
     address: 'Opp. Gurajada Kalakshetram, Siripuram, Visakhapatnam - 530003',
     specialties: ['PCB Board Component Repair', 'Sensor Calibration', 'OEM Spares'],
+    supportedAppliances: ['Televisions (LED / Smart TV)', 'Microwave Oven', 'Inverters & Home UPS', 'Water Purifier & RO Systems', 'Dishwasher'],
+    status: 'Open',
+    openingHours: 'Open Now • Closes 9:00 PM',
+    isSampleData: true,
     verified: true,
     isOpenNow: true,
   },
@@ -172,8 +180,12 @@ const LOCAL_SHOPS_VIZAG = [
     phone: '+91 94401 88990',
     address: 'Behind Car Shed Junction, Madhurawada, Visakhapatnam - 530048',
     specialties: ['Heavy Tub Replacement', 'Compressor Refurbishing', 'Doorstep Pickup'],
+    supportedAppliances: ['Air Conditioner', 'Refrigerator', 'Washing Machine', 'Water Heaters & Geysers'],
+    status: 'Temporarily Unavailable',
+    openingHours: 'Temporarily Unavailable • High Service Queue',
+    isSampleData: true,
     verified: true,
-    isOpenNow: true,
+    isOpenNow: false,
   },
   {
     id: 'shop-4',
@@ -186,6 +198,10 @@ const LOCAL_SHOPS_VIZAG = [
     phone: '+91 891 255 4321',
     address: 'Lane 4, Beside RTC Complex, Dwaraka Nagar, Visakhapatnam - 530016',
     specialties: ['Belt & Pulley Replacements', 'Quick Drain Pump Swap', 'Budget Repairs'],
+    supportedAppliances: ['Washing Machine', 'Microwave Oven', 'Electric Irons & Steam Irons', 'Mixers & Grinders', 'Fans (Ceiling / Stand / Exhaust)'],
+    status: 'Closed',
+    openingHours: 'Closed • Opens Tomorrow 9:30 AM',
+    isSampleData: true,
     verified: true,
     isOpenNow: false,
   },
@@ -200,8 +216,48 @@ const LOCAL_SHOPS_VIZAG = [
     phone: '+91 98852 33445',
     address: 'Near High School Road, Old Gajuwaka, Visakhapatnam - 530026',
     specialties: ['Heavy Duty Bearings', 'Motor Brushes', 'Industrial Grade Soldering'],
+    supportedAppliances: ['Inverters & Home UPS', 'Washing Machine', 'Water Heaters & Geysers', 'Fans (Ceiling / Stand / Exhaust)', 'Water Purifier & RO Systems'],
+    status: 'Open',
+    openingHours: 'Open Now • Closes 8:00 PM',
+    isSampleData: true,
     verified: true,
     isOpenNow: true,
+  },
+  {
+    id: 'shop-6',
+    name: 'Rushikonda AquaPure & Thermal Tech',
+    locality: 'Rushikonda',
+    distanceKm: 6.8,
+    rating: 4.7,
+    reviewCount: 98,
+    estimatedServiceCostINR: 800,
+    phone: '+91 891 279 8811',
+    address: 'IT SEZ Road, Near Beach Junction, Rushikonda, Visakhapatnam - 530045',
+    specialties: ['RO Membrane Flushing', 'Geyser Descaling', 'TDS Calibration'],
+    supportedAppliances: ['Water Purifier & RO Systems', 'Water Heaters & Geysers', 'Dishwasher', 'Electric Irons & Steam Irons'],
+    status: 'Open',
+    openingHours: 'Open Now • Closes 7:30 PM',
+    isSampleData: true,
+    verified: true,
+    isOpenNow: true,
+  },
+  {
+    id: 'shop-7',
+    name: 'Steel City Smart TV & Audio Lab',
+    locality: 'Kurmannapalem',
+    distanceKm: 14.2,
+    rating: 4.5,
+    reviewCount: 114,
+    estimatedServiceCostINR: 950,
+    phone: '+91 98492 66778',
+    address: 'National Highway 16, Beside Rythu Bazaar, Kurmannapalem, Visakhapatnam - 530046',
+    specialties: ['Backlight Replacement', 'SMPS Circuit Board Repair', 'Display Panel COF Bonding'],
+    supportedAppliances: ['Televisions (LED / Smart TV)', 'Microwave Oven', 'Inverters & Home UPS'],
+    status: 'Closed',
+    openingHours: 'Closed • Reopens Tomorrow 10:00 AM',
+    isSampleData: true,
+    verified: true,
+    isOpenNow: false,
   }
 ];
 
@@ -255,17 +311,37 @@ function calculateViability(repairCost, newPrice, currentAge, expectedLifespan) 
 const GEMINI_SYSTEM_PROMPT = `You are the core diagnostic engine for Project RRR (Repair First, Replace Last), designed by Team Quantum Four in Visakhapatnam, Andhra Pradesh, India.
 Your mission is to combat premature appliance disposal and consumer financial opacity by mathematically and visually determining whether a broken machine is worth repairing vs replacing.
 
-When given an appliance label/model, symptoms description, and optional photo:
-1. Extract or infer Product Metadata: brand, model, appliance category (Washing Machine, Refrigerator, Air Conditioner, Microwave Oven, Television, etc.), estimated manufacturing year, warranty status (Active/Expired), expected lifespan in years, and current market price of a new equivalent in Indian Rupees (INR).
-2. Fault Isolation:
-   - Visible/External Faults: list exact component damages, severity (Low/Medium/High), and immediate fixes.
-   - Internal/Hidden Faults: calculate percentage-based failure probabilities (e.g. 78% drum bearing wear), engineering rationale, and risk if ignored.
-3. DIY Guidance: step-by-step DIY repair instructions, required household tools, safety warnings, and difficulty rating.
-4. Estimated Repair Cost in Indian Rupees (INR) including local Visakhapatnam parts and standard neighborhood labor.
-5. Estimated machine weight in kilograms (for e-waste calculation).
+CRITICAL DIAGNOSTIC & SAFETY DIRECTIVES:
+1. Evidence Grounding:
+   - Analyze the uploaded appliance image and the user's written description TOGETHER.
+   - Identify ONLY faults directly supported by the available evidence.
+   - Do NOT invent faults or claim certainty without sufficient evidence.
+   - If the image and description do not provide enough information (e.g., user wrote only "broken" or "not working"), set "needsMoreInfo": true and specify 2 to 3 targeted "clarificationQuestions" asking for details like unusual sounds, error codes, lights, or power behavior.
+2. Clear Separation of Fault Types:
+   - "visibleFaults": ONLY physical casing, filter, leveling, cord, or surface defects directly observable from the exterior or photo. If no external damage is visible in the photo, clearly note "No external physical casing fractures detected; fault is internal".
+   - "hiddenFaults": Internal electrical, mechanical, thermodynamic, or sensor faults deduced with percentage probability, engineering rationale, risk if ignored, and a safe verification method.
+3. Strict Electrical Safety & DIY Guidance:
+   - Never encourage users to open high-voltage components (microwave magnetron/capacitor, air conditioner dual capacitor, CRT/SMPS power supply, inverter transformer, or live water heater immersion elements).
+   - For electrical hazards, exposed wires, high-voltage components, or dangerous internal repairs, set "hasElectricalHazard": true, provide a prominent safety warning, instruct users to disconnect power where safe, and recommend a qualified technician.
+   - Provide numbered, beginner-friendly DIY steps ONLY for safe operations (cleaning filters, leveling feet, clearing lint traps, replacing external drive belts, checking reset buttons). For each step, set "userSafe": true (for ordinary users) or false (technician required).
+4. Supported Appliance Categories:
+   - Microwave ovens
+   - Inverters & Home UPS
+   - Refrigerators
+   - Washing machines
+   - Air conditioners
+   - Televisions
+   - Fans
+   - Water heaters/geysers
+   - Mixers and grinders
+   - Dishwashers
+   - Electric irons
+   - Water purifiers
 
 Respond strictly with valid JSON conforming to this schema (no extra markdown formatting, only valid JSON):
 {
+  "needsMoreInfo": false,
+  "clarificationQuestions": ["string"],
   "productMetadata": {
     "brand": "string",
     "model": "string",
@@ -280,7 +356,9 @@ Respond strictly with valid JSON conforming to this schema (no extra markdown fo
       "component": "string",
       "description": "string",
       "severity": "Low | Medium | High",
-      "immediateFix": "string"
+      "immediateFix": "string",
+      "evidenceSource": "Visual Inspection (Image) | User Description | Operational Inference",
+      "confidence": "Confirmed | Suspected"
     }
   ],
   "hiddenFaults": [
@@ -288,13 +366,17 @@ Respond strictly with valid JSON conforming to this schema (no extra markdown fo
       "component": "string",
       "probabilityPercent": 78,
       "rationale": "string",
-      "riskIfIgnored": "string"
+      "riskIfIgnored": "string",
+      "verificationMethod": "string"
     }
   ],
   "diyGuidance": {
     "feasibleForDIY": true,
     "difficulty": "Easy | Moderate | Advanced | Professional Only",
     "overallSafetyNotice": "string",
+    "hasElectricalHazard": false,
+    "electricalSafetyNotice": "string",
+    "technicianRequired": false,
     "requiredTools": ["string"],
     "steps": [
       {
@@ -303,7 +385,8 @@ Respond strictly with valid JSON conforming to this schema (no extra markdown fo
         "description": "string",
         "safetyWarning": "string",
         "toolsRequired": ["string"],
-        "estimatedMinutes": 10
+        "estimatedMinutes": 10,
+        "userSafe": true
       }
     ]
   },
@@ -314,7 +397,7 @@ Respond strictly with valid JSON conforming to this schema (no extra markdown fo
 // AI Diagnosis API Endpoint
 app.post('/api/diagnose', upload.single('image'), async (req, res) => {
   try {
-    const { machineLabel, symptoms, userApiKey } = req.body;
+    const { machineLabel, symptoms, applianceCategory, userApiKey } = req.body;
     const apiKey = userApiKey || req.headers['x-gemini-key'] || process.env.GEMINI_API_KEY;
 
     let aiResult = null;
@@ -322,7 +405,6 @@ app.post('/api/diagnose', upload.single('image'), async (req, res) => {
     if (apiKey) {
       try {
         const genAI = new GoogleGenerativeAI(apiKey);
-        // PRD requests gemini-2.5-flash or gemini-1.5-flash
         const model = genAI.getGenerativeModel({
           model: 'gemini-2.5-flash',
           generationConfig: { responseMimeType: 'application/json' }
@@ -330,7 +412,8 @@ app.post('/api/diagnose', upload.single('image'), async (req, res) => {
 
         const promptParts = [
           GEMINI_SYSTEM_PROMPT,
-          `\nAppliance Model/Label: ${machineLabel || 'Unspecified Appliance'}`,
+          `\nAppliance Category: ${applianceCategory || 'Auto-detect from model'}`,
+          `Appliance Model/Label: ${machineLabel || 'Unspecified Appliance'}`,
           `Live Symptoms Described by User: ${symptoms || 'General performance degradation'}`
         ];
 
@@ -353,7 +436,7 @@ app.post('/api/diagnose', upload.single('image'), async (req, res) => {
 
     // Fallback Expert Diagnostic Generator if no API key or API call failed
     if (!aiResult) {
-      aiResult = generateExpertDiagnosisFallback(machineLabel, symptoms);
+      aiResult = generateExpertDiagnosisFallback(machineLabel, symptoms, applianceCategory, !!req.file);
     }
 
     const currentYear = new Date().getFullYear();
@@ -372,6 +455,14 @@ app.post('/api/diagnose', upload.single('image'), async (req, res) => {
       { year: '2026', repairCostINR: viability.estRepairCostINR, replacementCostINR: viability.newEquivalentPriceINR, partsAvailabilityIndex: 85 },
     ];
 
+    // Select shops supporting this appliance category
+    const catName = aiResult.productMetadata.category || applianceCategory || '';
+    const matchingShops = LOCAL_SHOPS_VIZAG.filter(s =>
+      s.supportedAppliances.some(a => a.toLowerCase().includes(catName.toLowerCase()) || catName.toLowerCase().includes(a.toLowerCase()))
+    );
+
+    const relevantShops = matchingShops.length > 0 ? matchingShops.slice(0, 4) : LOCAL_SHOPS_VIZAG.slice(0, 3);
+
     const diagnosisRecord = {
       id: `diag-${Date.now()}`,
       timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
@@ -380,12 +471,19 @@ app.post('/api/diagnose', upload.single('image'), async (req, res) => {
       imageUrl: req.file ? `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}` : undefined,
       estimatedApplianceWeightKg: aiResult.estimatedApplianceWeightKg || 35,
       status: viability.tier === 'red' ? 'Recycled' : 'Pending',
+      needsMoreInfo: !!aiResult.needsMoreInfo,
+      clarificationQuestions: aiResult.clarificationQuestions || undefined,
+      evidenceSummary: {
+        hasImage: !!req.file,
+        descriptionQuality: (symptoms || '').split(' ').length > 6 ? 'Detailed' : 'Moderate',
+        confidenceScore: aiResult.needsMoreInfo ? 45 : req.file ? 93 : 80
+      },
       productMetadata: aiResult.productMetadata,
       visibleFaults: aiResult.visibleFaults || [],
       hiddenFaults: aiResult.hiddenFaults || [],
       diyGuidance: aiResult.diyGuidance || { feasibleForDIY: false, difficulty: 'Moderate', overallSafetyNotice: 'Safety first', requiredTools: [], steps: [] },
       viability,
-      localShops: viability.tier === 'red' ? [] : LOCAL_SHOPS_VIZAG.slice(0, 3),
+      localShops: viability.tier === 'red' ? [] : relevantShops,
       costTrend
     };
 
@@ -393,7 +491,7 @@ app.post('/api/diagnose', upload.single('image'), async (req, res) => {
 
     return res.json({
       success: true,
-      message: 'Picture captured & analyzed successfully!',
+      message: 'Appliance analyzed successfully!',
       diagnosis: diagnosisRecord
     });
   } catch (err) {
@@ -402,86 +500,200 @@ app.post('/api/diagnose', upload.single('image'), async (req, res) => {
   }
 });
 
-// Fallback rule-based diagnostic engine
-function generateExpertDiagnosisFallback(label = '', symptoms = '') {
-  const text = `${label} ${symptoms}`.toLowerCase();
-  
-  if (text.includes('wash') || text.includes('spin') || text.includes('drum') || text.includes('rinse')) {
+// Fallback rule-based diagnostic engine covering all 12 appliance categories
+function generateExpertDiagnosisFallback(label = '', symptoms = '', categoryHint = '', hasImage = false) {
+  const text = `${label} ${symptoms} ${categoryHint}`.toLowerCase();
+  const wordCount = (symptoms || '').trim().split(/\s+/).filter(Boolean).length;
+  const isVague = wordCount < 4 || ['broken', 'not working', 'problem', 'issue', 'fault'].includes((symptoms || '').trim().toLowerCase());
+
+  // Helper to format generic questions if vague
+  const checkVagueness = (specificQuestions) => {
+    if (isVague && !hasImage) {
+      return {
+        needsMoreInfo: true,
+        clarificationQuestions: specificQuestions
+      };
+    }
+    return { needsMoreInfo: false };
+  };
+
+  // 1. MICROWAVE OVENS
+  if (text.includes('microwave') || text.includes('oven')) {
+    const vagueness = checkVagueness([
+      'Does the turntable rotate and lamp glow while heating fails?',
+      'Are there sparks or a burning smell coming from the right interior mica plate?',
+      'Is there an error code on the digital touchpad?'
+    ]);
+
     return {
+      ...vagueness,
       productMetadata: {
         brand: label.split(' ')[0] || 'LG',
-        model: label || 'Smart Inverter Top-Load 7kg',
-        category: 'Washing Machine',
+        model: label || 'Solo / Convection Microwave 28L',
+        category: 'Microwave Oven',
         estimatedYear: 2022,
         warrantyStatus: 'Expired',
-        expectedLifespanYears: 10,
-        newEquivalentPriceINR: 24990
+        expectedLifespanYears: 8,
+        newEquivalentPriceINR: 11500
       },
-      visibleFaults: [
+      visibleFaults: hasImage ? [
         {
-          component: 'Leveling Foot / Dampening Pad',
-          description: 'Chassis unleveling causing rotational wobble at high RPM spin.',
-          severity: 'Low',
-          immediateFix: 'Adjust the front left screw foot clockwise until drum sits dead center.'
-        },
+          component: 'Interior Cavity Waveguide Mica Cover Sheet',
+          description: 'Darkened carbon deposits or food splatter observed on the right waveguide cover sheet.',
+          severity: 'Medium',
+          immediateFix: 'Wipe cavity with damp cloth; replace burnt mica sheet (approx ₹150).',
+          evidenceSource: 'Visual Inspection (Image)',
+          confidence: 'Confirmed'
+        }
+      ] : [
         {
-          component: 'Drain Filter Lint Screen',
-          description: 'Partial lint and debris restriction in bottom coin collector.',
+          component: 'Door Latch & Safety Interlock Hooks',
+          description: 'External casing inspection: door latch springs and hinges show normal mechanical retention.',
           severity: 'Low',
-          immediateFix: 'Unscrew coin trap hatch at lower bottom, flush lint under running tap.'
+          immediateFix: 'Ensure door closes firmly with a double click to engage safety interlock switch.',
+          evidenceSource: 'Operational Inference',
+          confidence: 'Suspected'
         }
       ],
       hiddenFaults: [
         {
-          component: 'Drum Suspension Rod Damper Springs',
-          probabilityPercent: 78,
-          rationale: 'Damping silicone oil loss in corner struts allows oscillatory drumming.',
-          riskIfIgnored: 'Drum wall collides with outer cabinet shell, damaging water inlet valves.'
-        },
+          component: 'High-Voltage Magnetron Vacuum Tube & Diode',
+          probabilityPercent: 86,
+          rationale: 'Absence of RF microwave oscillation with normal timer logic indicates open HV diode or depleted magnetron filament.',
+          riskIfIgnored: 'HV transformer primary winding overheats and blows main chassis ceramic fuse.',
+          verificationMethod: 'Authorized service tech checks HV diode forward bias voltage and magnetron filament continuity.'
+        }
+      ],
+      diyGuidance: {
+        feasibleForDIY: false,
+        difficulty: 'Professional Only',
+        overallSafetyNotice: 'LETHAL HIGH VOLTAGE HAZARD: Microwave capacitors store 2,000V - 4,000V DC even when unplugged. NEVER open the external metal cabinet. Contact a certified technician.',
+        hasElectricalHazard: true,
+        electricalSafetyNotice: 'Disconnect wall plug immediately. Do not attempt to dismantle the metal casing.',
+        technicianRequired: true,
+        requiredTools: ['Unplug Power Cord (Safety Only)'],
+        steps: [
+          {
+            stepNumber: 1,
+            title: 'Isolate Wall Power',
+            description: 'Unplug the 16A 3-pin plug from the wall socket immediately.',
+            safetyWarning: 'Do not remove rear or top metal casing.',
+            toolsRequired: ['None'],
+            estimatedMinutes: 2,
+            userSafe: true
+          },
+          {
+            stepNumber: 2,
+            title: 'Inspect & Replace Mica Cover (Safe)',
+            description: 'Inside the cooking cavity, inspect the thin silver/brown mica sheet on the right wall. If burnt or oily, snap it out and replace with a fresh pre-cut sheet.',
+            toolsRequired: ['Damp cloth'],
+            estimatedMinutes: 5,
+            userSafe: true
+          },
+          {
+            stepNumber: 3,
+            title: 'Contact Certified Technician for Magnetron Test',
+            description: 'Book a certified microwave technician in Visakhapatnam to discharge the HV capacitor and test the magnetron/diode.',
+            toolsRequired: ['Phone / RRR Dispatch'],
+            estimatedMinutes: 5,
+            userSafe: true
+          }
+        ]
+      },
+      estRepairCostINR: 1450,
+      estimatedApplianceWeightKg: 15
+    };
+  }
+
+  // 2. INVERTERS & HOME UPS
+  if (text.includes('inverter') || text.includes('ups') || text.includes('battery')) {
+    const vagueness = checkVagueness([
+      'Is the inverter emitting a continuous overload beep or low battery warning?',
+      'Are the positive/negative battery terminal posts encrusted with white/green sulfate powder?',
+      'Does the inverter switch to battery mode during power cuts, or do lights turn off immediately?'
+    ]);
+
+    return {
+      ...vagueness,
+      productMetadata: {
+        brand: label.split(' ')[0] || 'Luminous',
+        model: label || 'Pure Sine Wave 900VA Inverter',
+        category: 'Inverters & Home UPS',
+        estimatedYear: 2021,
+        warrantyStatus: 'Expired',
+        expectedLifespanYears: 7,
+        newEquivalentPriceINR: 18500
+      },
+      visibleFaults: [
         {
-          component: 'Rotor Ball Bearing (6205RS)',
-          probabilityPercent: 64,
-          rationale: 'Rattling pitch matches high frequency metallic bearing ball friction.',
-          riskIfIgnored: 'Permanent stator drive lockup and drive motor overload.'
+          component: 'Battery Lead Terminal Clamps & Cable Lugs',
+          description: 'Heavy lead sulfate corrosion layer coating battery terminal posts causing voltage drop under load.',
+          severity: 'Medium',
+          immediateFix: 'Clean terminals with warm baking soda solution and apply petroleum jelly.',
+          evidenceSource: hasImage ? 'Visual Inspection (Image)' : 'User Description',
+          confidence: 'Confirmed'
+        }
+      ],
+      hiddenFaults: [
+        {
+          component: 'Internal Charging Section MOSFET Bank & Fuse',
+          probabilityPercent: 74,
+          rationale: 'Grid voltage spikes blown 30A DC charging fuse or power MOSFET switching bridge.',
+          riskIfIgnored: 'Permanent deep-discharge cell sulfation destroying battery plates.',
+          verificationMethod: 'Measure charging voltage across battery terminals: should read 13.8V - 14.4V DC.'
         }
       ],
       diyGuidance: {
         feasibleForDIY: true,
         difficulty: 'Moderate',
-        overallSafetyNotice: 'Disconnect 230V AC wall plug and disconnect water inlet hoses prior to work.',
-        requiredTools: ['10mm Socket Wrench', 'Phillips Screwdriver', 'High-temp Lithium Grease', 'Pliers'],
+        overallSafetyNotice: 'BATTERY CURRENT & ACID HAZARD: Never short positive and negative battery terminals with a metal tool (causes explosive short circuit). Wear rubber gloves.',
+        hasElectricalHazard: true,
+        electricalSafetyNotice: 'Unplug inverter mains cord and switch off DC battery circuit breaker before cleaning terminals.',
+        technicianRequired: false,
+        requiredTools: ['10mm/12mm Insulated Spanner', 'Brass Wire Brush', 'Baking Soda', 'Distilled Water', 'Petroleum Jelly'],
         steps: [
           {
             stepNumber: 1,
-            title: 'Unplug and Drain Residual Water',
-            description: 'Turn off tap water inlet, place low pan below back drain and disconnect hose.',
-            safetyWarning: 'Ensure zero electrical current before opening rear cabinet.',
-            toolsRequired: ['Pliers', 'Bucket'],
-            estimatedMinutes: 5
+            title: 'Isolate Mains & Battery Breaker',
+            description: 'Turn front inverter switch OFF and unplug the 3-pin power cord from wall.',
+            toolsRequired: ['None'],
+            estimatedMinutes: 2,
+            userSafe: true
           },
           {
             stepNumber: 2,
-            title: 'Inspect Rear Suspension Dampers',
-            description: 'Remove 4 Phillips screws holding upper top cover. Lift lid and inspect suspension rod cups.',
-            toolsRequired: ['Phillips Screwdriver'],
-            estimatedMinutes: 10
+            title: 'Neutralize & Scrub Corroded Terminals',
+            description: 'Dissolve baking soda in warm water. Pour slowly over corroded terminal posts and scrub clean with wire brush until bright lead is exposed.',
+            safetyWarning: 'Wear rubber gloves to protect skin from dilute sulfuric acid.',
+            toolsRequired: ['Baking soda', 'Warm water', 'Wire brush'],
+            estimatedMinutes: 10,
+            userSafe: true
           },
           {
             stepNumber: 3,
-            title: 'Lubricate Strut Cups and Re-level',
-            description: 'Apply generous lithium damping grease into plastic ball pivot joints. Check spirit level.',
-            toolsRequired: ['High-temp Lithium Grease'],
-            estimatedMinutes: 12
+            title: 'Tighten Bolts & Coat with Petroleum Jelly',
+            description: 'Tighten terminal bolts securely with insulated spanner. Coat with petroleum jelly to prevent re-oxidation.',
+            toolsRequired: ['Spanner', 'Petroleum jelly'],
+            estimatedMinutes: 5,
+            userSafe: true
           }
         ]
       },
-      estRepairCostINR: 2850,
-      estimatedApplianceWeightKg: 42
+      estRepairCostINR: 650,
+      estimatedApplianceWeightKg: 45
     };
   }
 
+  // 3. REFRIGERATORS
   if (text.includes('fridge') || text.includes('refrigerat') || text.includes('cool') || text.includes('freeze')) {
+    const vagueness = checkVagueness([
+      'Is the freezer freezing fine while the fresh food compartment is warm?',
+      'Do you hear clicking sounds every few minutes from the bottom compressor area?',
+      'Is water leaking under the vegetable crisper drawer?'
+    ]);
+
     return {
+      ...vagueness,
       productMetadata: {
         brand: label.split(' ')[0] || 'Samsung',
         model: label || 'Double Door Inverter 253L',
@@ -489,95 +701,732 @@ function generateExpertDiagnosisFallback(label = '', symptoms = '') {
         estimatedYear: 2021,
         warrantyStatus: 'Expired',
         expectedLifespanYears: 12,
-        newEquivalentPriceINR: 26800
+        newEquivalentPriceINR: 27500
       },
       visibleFaults: [
         {
-          component: 'Condenser Coils Air Grille',
-          description: 'Dust blanket coating bottom compressor coils reducing heat rejection.',
+          component: 'Door Magnetic Gasket Seal',
+          description: 'Magnetic gasket rubber shows mild deformation or dust buildup allowing humid air infiltration.',
           severity: 'Low',
-          immediateFix: 'Vacuum dust from rear lower metal coils using brush nozzle.'
+          immediateFix: 'Clean rubber folds with warm soapy water; warm deformed gasket with hairdryer to restore magnetic seal.',
+          evidenceSource: hasImage ? 'Visual Inspection (Image)' : 'Operational Inference',
+          confidence: 'Confirmed'
         }
       ],
       hiddenFaults: [
         {
-          component: 'Defrost Bimetal Thermostat & Timer',
-          probabilityPercent: 82,
+          component: 'Bimetal Defrost Thermostat & Thermal Fuse',
+          probabilityPercent: 84,
           rationale: 'Evaporator coil frost choking lower airflow passage while freezer stays cold.',
-          riskIfIgnored: 'Fan blade locks up against solid ice block; compressor overheats.'
+          riskIfIgnored: 'Fan blade locks up against solid ice block; compressor overheats.',
+          verificationMethod: 'Test heater resistance (250-350Ω) and bimetal continuity when frozen sub-zero.'
         }
       ],
       diyGuidance: {
         feasibleForDIY: true,
         difficulty: 'Easy',
         overallSafetyNotice: 'Unplug refrigerator from power outlet before touching internal electrical clips.',
-        requiredTools: ['Phillips Screwdriver', 'Digital Multimeter', 'Hair Dryer'],
+        hasElectricalHazard: true,
+        electricalSafetyNotice: 'Unplug power cord. Never chip ice with knives (punctures aluminum gas evaporator).',
+        technicianRequired: false,
+        requiredTools: ['Phillips Screwdriver', 'Hairdryer (Warm Air)', 'Warm Water in Squeeze Bottle', 'Towels'],
         steps: [
           {
             stepNumber: 1,
-            title: 'Remove Freezer Rear Cover Panel',
-            description: 'Unscrew 2 screws in freezer compartment and unclip cold air distribution panel.',
-            toolsRequired: ['Phillips Screwdriver'],
-            estimatedMinutes: 6
+            title: 'Manual 12-Hour Defrost',
+            description: 'Unplug power cord. Place towels around base and leave both doors open for 12 hours.',
+            safetyWarning: 'Never chip ice with sharp metal tools.',
+            toolsRequired: ['Towels'],
+            estimatedMinutes: 10,
+            userSafe: true
           },
           {
             stepNumber: 2,
-            title: 'Test Defrost Sensor Continuity',
-            description: 'Measure resistance across defrost sensor pins. Replace clip-on bimetal if open circuit.',
-            toolsRequired: ['Digital Multimeter'],
-            estimatedMinutes: 8
+            title: 'Flush Defrost Drain Hole',
+            description: 'Locate drain hole in freezer floor or lower back panel. Flush warm water to clear algae slime.',
+            toolsRequired: ['Warm water', 'Squeeze bottle'],
+            estimatedMinutes: 10,
+            userSafe: true
           }
         ]
       },
-      estRepairCostINR: 1950,
-      estimatedApplianceWeightKg: 54
+      estRepairCostINR: 1850,
+      estimatedApplianceWeightKg: 55
     };
   }
 
-  // Default generic appliance diagnostic
+  // 4. AIR CONDITIONERS
+  if (text.includes('ac') || text.includes('air cond') || text.includes('split') || text.includes('window ac')) {
+    const vagueness = checkVagueness([
+      'Is the indoor blower running while the outdoor unit fan remains stopped?',
+      'Is water dripping from the front of the indoor wall unit?',
+      'Do you observe thin frost forming on the outdoor copper pipes?'
+    ]);
+
+    return {
+      ...vagueness,
+      productMetadata: {
+        brand: label.split(' ')[0] || 'Voltas',
+        model: label || '1.5 Ton 3-Star Inverter Split AC',
+        category: 'Air Conditioner',
+        estimatedYear: 2021,
+        warrantyStatus: 'Expired',
+        expectedLifespanYears: 8,
+        newEquivalentPriceINR: 36500
+      },
+      visibleFaults: [
+        {
+          component: 'Indoor Evaporator Mesh Air Filters',
+          description: 'Dense dust blanket coating indoor nylon mesh filters, cutting airflow across cooling coils by >60%.',
+          severity: 'Low',
+          immediateFix: 'Slide out dual nylon filters, rinse under lukewarm running water, let dry before reinserting.',
+          evidenceSource: hasImage ? 'Visual Inspection (Image)' : 'User Description',
+          confidence: 'Confirmed'
+        }
+      ],
+      hiddenFaults: [
+        {
+          component: 'Outdoor Dual Run Capacitor (45µF + 5µF 450VAC)',
+          probabilityPercent: 76,
+          rationale: 'Thermal stress in outdoor tropical sun causing capacitor dielectric bulging and weak fan spool.',
+          riskIfIgnored: 'Compressor thermal overload protector trips repeatedly, eventually burning compressor motor.',
+          verificationMethod: 'Test capacitance with digital multimeter across C-HERM and C-FAN terminals.'
+        }
+      ],
+      diyGuidance: {
+        feasibleForDIY: true,
+        difficulty: 'Moderate',
+        overallSafetyNotice: 'HIGH VOLTAGE ELECTRICAL HAZARD: Never open outdoor electrical box or handle 450V capacitor terminals. Perform only indoor filter and drain pipe maintenance.',
+        hasElectricalHazard: true,
+        electricalSafetyNotice: 'Turn off AC circuit breaker / MCB on distribution board before touching any unit.',
+        technicianRequired: false,
+        requiredTools: ['Soft Nylon Brush', 'Lukewarm Water', 'Mild Soap', 'Clean Towel'],
+        steps: [
+          {
+            stepNumber: 1,
+            title: 'Turn Off AC MCB',
+            description: 'Switch off the dedicated AC MCB in your home breaker box.',
+            toolsRequired: ['None'],
+            estimatedMinutes: 1,
+            userSafe: true
+          },
+          {
+            stepNumber: 2,
+            title: 'Wash Indoor Nylon Filters',
+            description: 'Lift front panel upward, slide out the two mesh filters, and rinse gently under tap water.',
+            safetyWarning: 'Do not touch aluminum cooling fins with bare fingers.',
+            toolsRequired: ['Water tap', 'Towel'],
+            estimatedMinutes: 8,
+            userSafe: true
+          },
+          {
+            stepNumber: 3,
+            title: 'Contact Technician for Outdoor Capacitor Check',
+            description: 'If outdoor fan still does not spin, have a verified technician test and replace the 45µF capacitor.',
+            toolsRequired: ['Phone / RRR Dispatch'],
+            estimatedMinutes: 5,
+            userSafe: true
+          }
+        ]
+      },
+      estRepairCostINR: 3800,
+      estimatedApplianceWeightKg: 46
+    };
+  }
+
+  // 5. TELEVISIONS
+  if (text.includes('tv') || text.includes('televis') || text.includes('led') || text.includes('screen') || text.includes('display')) {
+    const vagueness = checkVagueness([
+      'Is sound playing normally while the screen is completely pitch black?',
+      'Can you see a faint picture when shining a flashlight 2 inches away from the dark screen?',
+      'Is the front standby LED blinking in a specific red sequence?'
+    ]);
+
+    return {
+      ...vagueness,
+      productMetadata: {
+        brand: label.split(' ')[0] || 'Samsung',
+        model: label || '43-inch 4K Smart LED TV',
+        category: 'Televisions (LED / Smart TV)',
+        estimatedYear: 2021,
+        warrantyStatus: 'Expired',
+        expectedLifespanYears: 7,
+        newEquivalentPriceINR: 28000
+      },
+      visibleFaults: [
+        {
+          component: 'External HDMI / AV Cable Connection',
+          description: 'Exterior ports and power cable check: pins and cord strain reliefs are intact with no physical bending.',
+          severity: 'Low',
+          immediateFix: 'Reseat HDMI cables firmly and switch inputs using remote TV source button.',
+          evidenceSource: hasImage ? 'Visual Inspection (Image)' : 'Operational Inference',
+          confidence: 'Confirmed'
+        }
+      ],
+      hiddenFaults: [
+        {
+          component: 'Internal LED Backlight Strip Array',
+          probabilityPercent: 86,
+          rationale: 'Sound working with totally dark screen confirms open-circuit SMD LED bead in backlight string.',
+          riskIfIgnored: 'Constant voltage boost driver overload trips main board safety shutdown.',
+          verificationMethod: 'Flashlight reflection test or constant-current LED backlight strip tester.'
+        }
+      ],
+      diyGuidance: {
+        feasibleForDIY: false,
+        difficulty: 'Professional Only',
+        overallSafetyNotice: 'HIGH VOLTAGE & FRAGILE GLASS HAZARD: TV power boards contain 400V capacitors. LCD panels are 1.2mm fragile glass that fractures easily. Backlight replacement requires a cleanroom suction bench.',
+        hasElectricalHazard: true,
+        electricalSafetyNotice: 'Unplug power cord. Do not attempt to pry open display bezel.',
+        technicianRequired: true,
+        requiredTools: ['Smartphone Flashlight (Diagnosis Only)'],
+        steps: [
+          {
+            stepNumber: 1,
+            title: 'Flashlight Test',
+            description: 'Turn TV ON in dark room. Shine smartphone flashlight 2 inches from glass to see if faint ghostly picture is visible.',
+            toolsRequired: ['Flashlight'],
+            estimatedMinutes: 3,
+            userSafe: true
+          },
+          {
+            stepNumber: 2,
+            title: 'Book Certified Backlight Replacement',
+            description: 'Book a certified local display technician who has suction cup glass tools to replace the LED strips safely.',
+            toolsRequired: ['Phone / RRR Dispatch'],
+            estimatedMinutes: 5,
+            userSafe: true
+          }
+        ]
+      },
+      estRepairCostINR: 2800,
+      estimatedApplianceWeightKg: 12
+    };
+  }
+
+  // 6. FANS
+  if (text.includes('fan') || text.includes('ceiling') || text.includes('cooler')) {
+    const vagueness = checkVagueness([
+      'Does the fan hum loudly and spin very slowly, or require a manual push to start?',
+      'Does the fan wobble violently or produce a dry squeaking chirp?',
+      'Is the wall regulator working on all speed positions?'
+    ]);
+
+    return {
+      ...vagueness,
+      productMetadata: {
+        brand: label.split(' ')[0] || 'Crompton',
+        model: label || '1200mm High Speed Ceiling Fan',
+        category: 'Fans (Ceiling / Stand / Exhaust)',
+        estimatedYear: 2021,
+        warrantyStatus: 'Expired',
+        expectedLifespanYears: 10,
+        newEquivalentPriceINR: 2800
+      },
+      visibleFaults: [
+        {
+          component: 'Aerofoil Fan Blades & Screws',
+          description: 'Heavy dust layer on leading blade edges and loose blade bracket mounting screws causing dynamic wobble.',
+          severity: 'Low',
+          immediateFix: 'Wipe blades with damp microfiber cloth and tighten 6 blade bracket screws.',
+          evidenceSource: hasImage ? 'Visual Inspection (Image)' : 'User Description',
+          confidence: 'Confirmed'
+        }
+      ],
+      hiddenFaults: [
+        {
+          component: 'Motor Run Capacitor (2.25µF - 2.5µF 440VAC)',
+          probabilityPercent: 88,
+          rationale: 'Thermal aging degraded metallized polypropylene film, dropping capacitance below 1.2µF.',
+          riskIfIgnored: 'Auxiliary winding overheats, eventually causing short-circuit stator coil burnout.',
+          verificationMethod: 'Test microfarads with capacitance meter or swap fresh ₹40 capacitor.'
+        }
+      ],
+      diyGuidance: {
+        feasibleForDIY: true,
+        difficulty: 'Easy',
+        overallSafetyNotice: 'SHUT OFF MAINS POWER AT SWITCHBOARD: Always switch off the wall switch AND fan circuit breaker before climbing a ladder.',
+        hasElectricalHazard: true,
+        electricalSafetyNotice: 'Disconnect power. Discharge capacitor wires before touching terminals.',
+        technicianRequired: false,
+        requiredTools: ['Step Ladder', 'Phillips Screwdriver', 'Replacement 2.5µF Capacitor (₹40)', 'Microfiber Cloth'],
+        steps: [
+          {
+            stepNumber: 1,
+            title: 'Power Off at Switchboard',
+            description: 'Turn off the wall fan switch. Ensure fan blades have come to a complete standstill.',
+            toolsRequired: ['None'],
+            estimatedMinutes: 2,
+            userSafe: true
+          },
+          {
+            stepNumber: 2,
+            title: 'Clean Blades & Tighten Screws',
+            description: 'Wipe all 3 blades clean. Tighten the 2 screws on each blade root.',
+            toolsRequired: ['Cloth', 'Screwdriver'],
+            estimatedMinutes: 8,
+            userSafe: true
+          },
+          {
+            stepNumber: 3,
+            title: 'Swap 2.5µF Run Capacitor',
+            description: 'Loosen upper canopy bell. Disconnect old capacitor and wire in fresh 2.5µF 440V capacitor.',
+            toolsRequired: ['Replacement Capacitor', 'Screwdriver'],
+            estimatedMinutes: 8,
+            userSafe: true
+          }
+        ]
+      },
+      estRepairCostINR: 350,
+      estimatedApplianceWeightKg: 4.5
+    };
+  }
+
+  // 7. WATER HEATERS / GEYSERS
+  if (text.includes('geyser') || text.includes('water heat') || text.includes('heater') || text.includes('hot water')) {
+    const vagueness = checkVagueness([
+      'Is the water not heating at all while the indicator light is OFF?',
+      'Do you feel an electric shock or tingle when touching the water tap?',
+      'Is water dripping from the bottom cover plate or pressure release valve?'
+    ]);
+
+    return {
+      ...vagueness,
+      productMetadata: {
+        brand: label.split(' ')[0] || 'AO Smith',
+        model: label || '15L Storage Electric Geyser',
+        category: 'Water Heaters & Geysers',
+        estimatedYear: 2021,
+        warrantyStatus: 'Expired',
+        expectedLifespanYears: 7,
+        newEquivalentPriceINR: 9500
+      },
+      visibleFaults: [
+        {
+          component: 'Pressure Relief Valve (PRV) & Inlet Fitting',
+          description: 'Minor calcium lime encrustation around pressure relief valve discharge nozzle.',
+          severity: 'Low',
+          immediateFix: 'Manually flick PRV spring lever twice to flush loose lime grit.',
+          evidenceSource: hasImage ? 'Visual Inspection (Image)' : 'Operational Inference',
+          confidence: 'Confirmed'
+        }
+      ],
+      hiddenFaults: [
+        {
+          component: '2000W Copper/Incoloy Immersion Heating Element',
+          probabilityPercent: 86,
+          rationale: 'Severe calcium carbonate hard water scale encrustation insulating copper sheath, causing sheath rupture.',
+          riskIfIgnored: 'Direct electrical grounding into bathroom water stream, posing lethal shock hazard.',
+          verificationMethod: 'Test resistance across element terminals (approx 26-28Ω) with power disconnected.'
+        }
+      ],
+      diyGuidance: {
+        feasibleForDIY: false,
+        difficulty: 'Professional Only',
+        overallSafetyNotice: 'CRITICAL SHOCK & WATER HAZARD: Water heaters combine 2000W electricity with pressurized water. Never open the lower electrical panel while geyser is connected. If electric shock is felt, SHUT OFF MCB IMMEDIATELY and contact an authorized technician.',
+        hasElectricalHazard: true,
+        electricalSafetyNotice: 'Shut off geyser switch and MCB immediately. Never operate a geyser without confirmed earth grounding.',
+        technicianRequired: true,
+        requiredTools: ['MCB Breaker Switch (Safety Only)'],
+        steps: [
+          {
+            stepNumber: 1,
+            title: 'Immediate Mains MCB Isolation',
+            description: 'Turn OFF the geyser wall switch and pull down the dedicated MCB on your distribution board.',
+            toolsRequired: ['None'],
+            estimatedMinutes: 1,
+            userSafe: true
+          },
+          {
+            stepNumber: 2,
+            title: 'Inspect External Reset Button',
+            description: 'Check underside of geyser for a small red button marked RESET. If geyser tripped, press firmly until a click is felt.',
+            toolsRequired: ['None'],
+            estimatedMinutes: 2,
+            userSafe: true
+          },
+          {
+            stepNumber: 3,
+            title: 'Book Certified Plumber/Electrician',
+            description: 'Book a certified plumber/electrician in Visakhapatnam to replace the heating element and test earth bonding.',
+            toolsRequired: ['Phone / RRR Dispatch'],
+            estimatedMinutes: 5,
+            userSafe: true
+          }
+        ]
+      },
+      estRepairCostINR: 1250,
+      estimatedApplianceWeightKg: 14
+    };
+  }
+
+  // 8. MIXERS & GRINDERS
+  if (text.includes('mixer') || text.includes('grinder') || text.includes('blender') || text.includes('juicer')) {
+    const vagueness = checkVagueness([
+      'Did the mixer abruptly stop while grinding thick batter?',
+      'Does the jar blade feel stiff or completely jammed when turned by hand?',
+      'Is batter or liquid leaking into the motor coupler socket?'
+    ]);
+
+    return {
+      ...vagueness,
+      productMetadata: {
+        brand: label.split(' ')[0] || 'Preethi',
+        model: label || '750W 3-Jar Mixer Grinder',
+        category: 'Mixers & Grinders',
+        estimatedYear: 2022,
+        warrantyStatus: 'Expired',
+        expectedLifespanYears: 8,
+        newEquivalentPriceINR: 3800
+      },
+      visibleFaults: [
+        {
+          component: 'Motor & Jar Drive Coupler Teeth',
+          description: 'Teeth on rubber/nylon drive coupler stripped or rounded off.',
+          severity: 'Medium',
+          immediateFix: 'Pry off stripped coupler with flathead screwdriver; screw on fresh universal coupler (cost ~₹40).',
+          evidenceSource: hasImage ? 'Visual Inspection (Image)' : 'User Description',
+          confidence: 'Confirmed'
+        }
+      ],
+      hiddenFaults: [
+        {
+          component: 'Bi-metallic Overload Protector Switch (OLP)',
+          probabilityPercent: 92,
+          rationale: 'Thermal bimetal strip in bottom OLP tripped automatically to protect universal motor from winding burnout.',
+          riskIfIgnored: 'Repeated forcing without cooling melts armature commutator insulation.',
+          verificationMethod: 'Cool unit for 15 minutes, press red trip button located under mixer bottom plate.'
+        }
+      ],
+      diyGuidance: {
+        feasibleForDIY: true,
+        difficulty: 'Easy',
+        overallSafetyNotice: 'Unplug power plug from wall socket before touching couplers or bottom reset button.',
+        hasElectricalHazard: true,
+        electricalSafetyNotice: 'Always unplug mixer before inspecting drive teeth.',
+        technicianRequired: false,
+        requiredTools: ['Flathead Screwdriver', 'Edible Cooking Oil', 'Clean Rag', 'Replacement Coupler (₹40)'],
+        steps: [
+          {
+            stepNumber: 1,
+            title: 'Press The Red Overload Reset Button',
+            description: 'Unplug mixer. Let motor cool for 15 minutes. Invert mixer base and press red button at bottom center until it clicks.',
+            toolsRequired: ['None'],
+            estimatedMinutes: 2,
+            userSafe: true
+          },
+          {
+            stepNumber: 2,
+            title: 'Lubricate Jammed Jar Bushing',
+            description: 'Add 4-5 drops of cooking oil onto brass jar spindle from bottom. Twist blade back and forth with thick cloth until free.',
+            safetyWarning: 'Hold sharp stainless blades with a folded cloth.',
+            toolsRequired: ['Cooking oil', 'Cloth'],
+            estimatedMinutes: 5,
+            userSafe: true
+          },
+          {
+            stepNumber: 3,
+            title: 'Replace Stripped Plastic Drive Coupler',
+            description: 'Pry off stripped coupler with flathead screwdriver and press on new replacement coupler.',
+            toolsRequired: ['Screwdriver', 'Replacement Coupler'],
+            estimatedMinutes: 6,
+            userSafe: true
+          }
+        ]
+      },
+      estRepairCostINR: 250,
+      estimatedApplianceWeightKg: 4.8
+    };
+  }
+
+  // 9. DISHWASHERS
+  if (text.includes('dishwash') || text.includes('dish')) {
+    const vagueness = checkVagueness([
+      'Is water pooling at the bottom sump basin after the cycle finishes?',
+      'Are dishes coming out gritty with white film or food particles?',
+      'Is error code E15 or tap symbol flashing?'
+    ]);
+
+    return {
+      ...vagueness,
+      productMetadata: {
+        brand: label.split(' ')[0] || 'Bosch',
+        model: label || '13 Place Setting Freestanding Dishwasher',
+        category: 'Dishwasher',
+        estimatedYear: 2021,
+        warrantyStatus: 'Expired',
+        expectedLifespanYears: 9,
+        newEquivalentPriceINR: 38000
+      },
+      visibleFaults: [
+        {
+          component: 'Cylindrical Sump Micro-Filter Assembly',
+          description: 'Fine stainless mesh screen choked with grease sludge and food particles.',
+          severity: 'Medium',
+          immediateFix: 'Rotate cylindrical filter counter-clockwise, lift out, and scrub with dish soap under warm tap.',
+          evidenceSource: hasImage ? 'Visual Inspection (Image)' : 'User Description',
+          confidence: 'Confirmed'
+        }
+      ],
+      hiddenFaults: [
+        {
+          component: 'Drain Pump Impeller & Check Valve',
+          probabilityPercent: 74,
+          rationale: 'Small debris or glass fragment jammed between magnetic pump impeller blades, stopping water drainage.',
+          riskIfIgnored: 'Drain pump motor coil burns out from locked-rotor current.',
+          verificationMethod: 'Remove filter, pop off white pump impeller cover, check if plastic impeller spins freely.'
+        }
+      ],
+      diyGuidance: {
+        feasibleForDIY: true,
+        difficulty: 'Easy',
+        overallSafetyNotice: 'Unplug power cord and shut off water isolation valve before servicing drain filter.',
+        hasElectricalHazard: true,
+        electricalSafetyNotice: 'Disconnect mains power. Watch for broken glass shards inside the bottom sump.',
+        technicianRequired: false,
+        requiredTools: ['Old Toothbrush', 'Wooden Toothpick', 'Dish Soap', 'Rubber Gloves'],
+        steps: [
+          {
+            stepNumber: 1,
+            title: 'Clean Cylindrical Micro-Filter',
+            description: 'Pull out bottom rack, turn filter 1/4 turn counter-clockwise, lift and scrub clean under warm tap.',
+            safetyWarning: 'Check for broken glass in sump basin before reaching in.',
+            toolsRequired: ['Toothbrush', 'Dish soap', 'Gloves'],
+            estimatedMinutes: 8,
+            userSafe: true
+          },
+          {
+            stepNumber: 2,
+            title: 'Poke Clean Spray Arm Jets',
+            description: 'Unscrew spray arms and use a wooden toothpick to poke trapped seeds out of nozzles.',
+            toolsRequired: ['Toothpick'],
+            estimatedMinutes: 8,
+            userSafe: true
+          }
+        ]
+      },
+      estRepairCostINR: 1100,
+      estimatedApplianceWeightKg: 48
+    };
+  }
+
+  // 10. ELECTRIC IRONS
+  if (text.includes('iron') || text.includes('steam iron') || text.includes('press')) {
+    const vagueness = checkVagueness([
+      'Does the iron fail to heat up completely with indicator light off?',
+      'Is white chalk or brown dirty water spitting out of steam holes?',
+      'Does the cord swivel joint at the handle feel loose or cut power when moved?'
+    ]);
+
+    return {
+      ...vagueness,
+      productMetadata: {
+        brand: label.split(' ')[0] || 'Philips',
+        model: label || 'GC1905 1440W Steam Iron',
+        category: 'Electric Irons & Steam Irons',
+        estimatedYear: 2022,
+        warrantyStatus: 'Expired',
+        expectedLifespanYears: 6,
+        newEquivalentPriceINR: 1950
+      },
+      visibleFaults: [
+        {
+          component: 'Handle Swivel Power Cord & Grommet',
+          description: 'Internal copper strand fatigue and insulation wear near handle strain relief.',
+          severity: 'High',
+          immediateFix: 'Do not use with frayed cord; replace 3-core heat-resistant cord with molded 16A plug (₹150).',
+          evidenceSource: hasImage ? 'Visual Inspection (Image)' : 'User Description',
+          confidence: 'Confirmed'
+        }
+      ],
+      hiddenFaults: [
+        {
+          component: 'Internal Thermal Fuse (240°C 10A Link)',
+          probabilityPercent: 78,
+          rationale: 'Thermostat contact chatter or overheating blew the non-resettable thermal fuse crimped inside handle.',
+          riskIfIgnored: 'Zero power delivery to heater element.',
+          verificationMethod: 'Multimeter continuity test across inline thermal fuse sleeve.'
+        }
+      ],
+      diyGuidance: {
+        feasibleForDIY: true,
+        difficulty: 'Easy',
+        overallSafetyNotice: 'SHOCK & BURN HAZARD: Never perform repairs while plugged in. Allow soleplate to cool for 45 minutes.',
+        hasElectricalHazard: true,
+        electricalSafetyNotice: 'Unplug power cord. Any cord with exposed copper strands must be replaced immediately.',
+        technicianRequired: false,
+        requiredTools: ['White Vinegar', 'Baking Soda', 'Soft Cloth', 'Clean Water'],
+        steps: [
+          {
+            stepNumber: 1,
+            title: 'Clean Starch & Scorched Soleplate',
+            description: 'Mix baking soda and water paste. Rub gently onto cold soleplate with a soft cloth. Wipe clean with damp towel.',
+            safetyWarning: 'Never scrub with steel wool or abrasive metal scourers.',
+            toolsRequired: ['Baking soda', 'Soft cloth'],
+            estimatedMinutes: 8,
+            userSafe: true
+          },
+          {
+            stepNumber: 2,
+            title: 'Vinegar Steam Descaling Flush',
+            description: 'Fill water tank 50% with equal parts white vinegar and distilled water. Turn to MAX steam for 5 minutes over sink to blow out lime scale.',
+            toolsRequired: ['White vinegar', 'Distilled water'],
+            estimatedMinutes: 8,
+            userSafe: true
+          }
+        ]
+      },
+      estRepairCostINR: 250,
+      estimatedApplianceWeightKg: 1.4
+    };
+  }
+
+  // 11. WATER PURIFIERS
+  if (text.includes('purif') || text.includes('ro') || text.includes('water filter') || text.includes('aquaguard') || text.includes('kent')) {
+    const vagueness = checkVagueness([
+      'Is purified water flowing into the tank as a thin trickle or stopped completely?',
+      'Is reject/waste water running continuously 24/7 without stopping?',
+      'Does the drinking water have a high TDS reading or strange taste?'
+    ]);
+
+    return {
+      ...vagueness,
+      productMetadata: {
+        brand: label.split(' ')[0] || 'Kent',
+        model: label || 'Grand Plus RO+UV+UF+TDS Water Purifier',
+        category: 'Water Purifier & RO Systems',
+        estimatedYear: 2021,
+        warrantyStatus: 'Expired',
+        expectedLifespanYears: 7,
+        newEquivalentPriceINR: 14500
+      },
+      visibleFaults: [
+        {
+          component: 'External Spun Polypropylene (PP) Pre-Filter Candle',
+          description: 'External transparent bowl shows white PP sediment candle darkened to deep mud-brown, choking inlet raw water pressure.',
+          severity: 'Medium',
+          immediateFix: 'Unscrew bowl with plastic spanner, flush housing, replace 5-micron spun candle (cost ~₹120).',
+          evidenceSource: hasImage ? 'Visual Inspection (Image)' : 'User Description',
+          confidence: 'Confirmed'
+        }
+      ],
+      hiddenFaults: [
+        {
+          component: 'Reverse Osmosis (RO) Thin-Film Membrane (75/80 GPD)',
+          probabilityPercent: 82,
+          rationale: 'Dissolved calcium/magnesium scaling blocked microscopic 0.0001 micron membrane pores, cutting pure water permeate flow.',
+          riskIfIgnored: 'Excessive backpressure damages booster pump head and diaphragm seals.',
+          verificationMethod: 'Measure TDS of raw input vs permeate output: rejection efficiency should be >90%.'
+        }
+      ],
+      diyGuidance: {
+        feasibleForDIY: true,
+        difficulty: 'Easy',
+        overallSafetyNotice: 'Unplug 24V power adapter and close blue inlet water tap before servicing filters.',
+        hasElectricalHazard: true,
+        electricalSafetyNotice: 'Always isolate electrical power supply and close raw water ball valve before unscrewing filter housings.',
+        technicianRequired: false,
+        requiredTools: ['Housing Spanner Wrench', 'Replacement PP Spun Candle (₹120)', 'Bucket / Basin'],
+        steps: [
+          {
+            stepNumber: 1,
+            title: 'Close Raw Water Inlet & Disconnect Power',
+            description: 'Turn off the small blue/chrome valve connected to your kitchen water tap. Unplug the 24V DC power adapter from the wall socket.',
+            toolsRequired: ['None'],
+            estimatedMinutes: 2,
+            userSafe: true
+          },
+          {
+            stepNumber: 2,
+            title: 'Replace External 5-Micron Pre-Filter Candle',
+            description: 'Slide bucket below external pre-filter cylinder. Use plastic ring spanner to unscrew bowl, discard brown cartridge, rinse bowl, and insert new white PP candle.',
+            safetyWarning: 'Ensure black rubber O-ring sits flat in bowl groove to prevent leaks.',
+            toolsRequired: ['Housing Wrench', 'New PP Candle (₹120)', 'Bucket'],
+            estimatedMinutes: 10,
+            userSafe: true
+          }
+        ]
+      },
+      estRepairCostINR: 1450,
+      estimatedApplianceWeightKg: 8.5
+    };
+  }
+
+  // 12. DEFAULT WASHING MACHINE
+  const vagueness = checkVagueness([
+    'Does the rattling noise happen during wash or only during high-speed spin?',
+    'Is the machine shaking or walking across the floor?',
+    'Is water draining completely or is an error code displayed?'
+  ]);
+
   return {
+    ...vagueness,
     productMetadata: {
-      brand: label.split(' ')[0] || 'Generic Brand',
-      model: label || 'Household Electronic Appliance',
-      category: 'Home Appliance',
-      estimatedYear: 2021,
+      brand: label.split(' ')[0] || 'LG',
+      model: label || 'Smart Inverter Top-Load Washing Machine 7.0kg',
+      category: 'Washing Machine',
+      estimatedYear: 2022,
       warrantyStatus: 'Expired',
-      expectedLifespanYears: 9,
-      newEquivalentPriceINR: 18500
+      expectedLifespanYears: 10,
+      newEquivalentPriceINR: 24990
     },
     visibleFaults: [
       {
-        component: 'External Power Cord & Casing Grommet',
-        description: 'Minor strain relief degradation near power plug entry point.',
+        component: 'Leveling Foot / Dampening Pad',
+        description: 'Chassis unleveling causing rotational wobble at high RPM spin.',
         severity: 'Low',
-        immediateFix: 'Inspect cable sheath for copper exposure and apply heat-shrink wrap.'
+        immediateFix: 'Adjust the front left screw foot clockwise until drum sits dead center.',
+        evidenceSource: hasImage ? 'Visual Inspection (Image)' : 'Operational Inference',
+        confidence: 'Confirmed'
+      },
+      {
+        component: 'Drain Filter Lint Screen',
+        description: 'Partial lint and debris restriction in bottom coin collector.',
+        severity: 'Low',
+        immediateFix: 'Unscrew coin trap hatch at lower bottom, flush lint under running tap.',
+        evidenceSource: 'Operational Inference',
+        confidence: 'Confirmed'
       }
     ],
     hiddenFaults: [
       {
-        component: 'Motor Driver Capacitor / Thermal Fuse',
-        probabilityPercent: 72,
-        rationale: 'Intermittent power cutouts and humming typical of capacitor microfarad drop.',
-        riskIfIgnored: 'Complete coil breakdown or internal fuse blowout.'
+        component: 'Rotor Ball Bearing (6205RS)',
+        probabilityPercent: 78,
+        rationale: 'Rattling pitch matches high frequency metallic bearing ball friction.',
+        riskIfIgnored: 'Permanent stator drive lockup and drive motor overload.',
+        verificationMethod: 'Rotate empty drum by hand: rough sandpaper friction confirms bearing wear.'
       }
     ],
     diyGuidance: {
       feasibleForDIY: true,
       difficulty: 'Moderate',
-      overallSafetyNotice: 'Always isolate mains power and verify zero voltage before servicing.',
-      requiredTools: ['Multimeter', 'Insulated Screwdriver', 'Wire Strippers'],
+      overallSafetyNotice: 'Disconnect 230V AC wall plug and disconnect water inlet hoses prior to work.',
+      hasElectricalHazard: true,
+      electricalSafetyNotice: 'Disconnect mains power. Never reach inside drum while spinning.',
+      technicianRequired: false,
+      requiredTools: ['10mm Socket Wrench', 'Phillips Screwdriver', 'High-temp Lithium Grease', 'Pliers'],
       steps: [
         {
           stepNumber: 1,
-          title: 'Safe Electrical Isolation',
-          description: 'Unplug appliance from wall socket and leave untouched for 10 minutes to discharge capacitors.',
-          toolsRequired: ['Insulated Screwdriver'],
-          estimatedMinutes: 10
+          title: 'Unplug and Drain Residual Water',
+          description: 'Turn off tap water inlet, place low pan below back drain and disconnect hose.',
+          safetyWarning: 'Ensure zero electrical current before opening rear cabinet.',
+          toolsRequired: ['Pliers', 'Bucket'],
+          estimatedMinutes: 5,
+          userSafe: true
+        },
+        {
+          stepNumber: 2,
+          title: 'Clean Bottom Drain Filter',
+          description: 'Open coin trap hatch at lower bottom, unscrew filter cap counter-clockwise, rinse under running tap.',
+          toolsRequired: ['Towel'],
+          estimatedMinutes: 6,
+          userSafe: true
         }
       ]
     },
-    estRepairCostINR: 1800,
-    estimatedApplianceWeightKg: 28
+    estRepairCostINR: 2850,
+    estimatedApplianceWeightKg: 42
   };
 }
 
@@ -625,12 +1474,22 @@ Provide helpful, clear, technically accurate troubleshooting steps, spare part s
 
 // Repair Shops List
 app.get('/api/shops', (req, res) => {
-  const { locality } = req.query;
-  if (locality) {
-    const filtered = LOCAL_SHOPS_VIZAG.filter(s => s.locality.toLowerCase().includes(locality.toLowerCase()));
-    return res.json(filtered);
+  const { locality, appliance } = req.query;
+  let results = LOCAL_SHOPS_VIZAG;
+
+  if (locality && !locality.includes('All Regions')) {
+    const cleanLoc = locality.toLowerCase().replace(', visakhapatnam', '').replace('visakhapatnam', '').trim();
+    results = results.filter(s => s.locality.toLowerCase().includes(cleanLoc));
   }
-  return res.json(LOCAL_SHOPS_VIZAG);
+
+  if (appliance) {
+    const cleanApp = appliance.toLowerCase();
+    results = results.filter(s => s.supportedAppliances.some(a =>
+      a.toLowerCase().includes(cleanApp) || cleanApp.includes(a.toLowerCase())
+    ));
+  }
+
+  return res.json(results);
 });
 
 // Diagnostic History

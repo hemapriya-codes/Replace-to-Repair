@@ -16,6 +16,8 @@ export interface VisibleFault {
   description: string;
   severity: 'Low' | 'Medium' | 'High';
   immediateFix: string;
+  evidenceSource?: 'Visual Inspection (Image)' | 'User Description' | 'Both Image & Symptoms' | 'Operational Inference';
+  confidence?: 'Confirmed' | 'Suspected' | 'Needs Clarification';
 }
 
 export interface HiddenFault {
@@ -23,6 +25,7 @@ export interface HiddenFault {
   probabilityPercent: number;
   rationale: string;
   riskIfIgnored: string;
+  verificationMethod?: string;
 }
 
 export interface DIYStep {
@@ -32,6 +35,8 @@ export interface DIYStep {
   safetyWarning?: string;
   toolsRequired: string[];
   estimatedMinutes: number;
+  userSafe?: boolean; // Explicitly designates whether step is safe for ordinary users
+  skillLevel?: 'Beginner-Friendly' | 'Moderate' | 'Professional Only';
 }
 
 export interface ViabilityCalculation {
@@ -61,6 +66,10 @@ export interface LocalRepairShop {
   phone: string;
   address: string;
   specialties: string[];
+  supportedAppliances: string[];
+  status: 'Open' | 'Closed' | 'Temporarily Unavailable';
+  openingHours?: string;
+  isSampleData: boolean; // Explicitly designates prototype sample data
   verified: boolean;
   isOpenNow: boolean;
 }
@@ -87,12 +96,22 @@ export interface DiagnosisResult {
     overallSafetyNotice: string;
     requiredTools: string[];
     steps: DIYStep[];
+    hasElectricalHazard?: boolean;
+    electricalSafetyNotice?: string;
+    technicianRequired?: boolean;
   };
   viability: ViabilityCalculation;
   localShops: LocalRepairShop[];
   costTrend: CostTrendPoint[];
   estimatedApplianceWeightKg: number;
   status: DeviceStatus;
+  needsMoreInfo?: boolean;
+  clarificationQuestions?: string[];
+  evidenceSummary?: {
+    hasImage: boolean;
+    descriptionQuality: 'Detailed' | 'Moderate' | 'Vague / Insufficient';
+    confidenceScore: number;
+  };
 }
 
 export interface EWasteImpactMetrics {
